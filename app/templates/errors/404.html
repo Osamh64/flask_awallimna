@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div style="text-align: center; margin-top: 50px;">
+        <h1>404 - الصفحة غير موجودة</h1>
+        <p style="font-size: 1.2em;">عذراً، الصفحة التي تبحث عنها غير متوفرة.</p>
+        <p><a href="{{ url_for('main.index') }}">العودة إلى الصفحة الرئيسية</a></p>
+        <p><small>المسار المطلوب: {{ request.path }}</small></p>
+    </div>
+{% endblock %}

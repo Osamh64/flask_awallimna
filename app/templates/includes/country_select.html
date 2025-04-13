@@ -1,0 +1,36 @@
+{# app/templates/includes/country_select.html #}
+{# يفترض أن field هو حقل SelectField الخاص بالدولة من WTForms #}
+{# ويتم تمرير country_list من الـ Route أو ملؤها في ال Form #}
+
+{% if field %}
+<div class="form-group {% if field.errors %}has-error{% endif %}">
+    {{ field.label(class="form-label") }}
+    {{ field(class="form-control", **kwargs) }}
+     {% if field.errors %}
+      <div class="invalid-feedback">
+        {% for error in field.errors %}
+          <span>{{ error }}</span><br>
+        {% endfor %}
+      </div>
+    {% endif %}
+</div>
+{% else %}
+<!-- Fallback or static select if not using WTForms field -->
+<div class="form-group">
+    <label for="center_country_static">البلد:</label>
+    <select id="center_country_static" name="country" class="form-control" required>
+        <option value="">اختر البلد</option>
+        <option value="Afghanistan">Afghanistan - أفغانستان</option>
+        <option value="Albania">Albania - ألبانيا</option>
+        <option value="Algeria">Algeria - الجزائر</option>
+        {# --- Add ALL other countries from center_country.php here --- #}
+        <option value="Andorra">Andorra - أندورا</option>
+        <option value="Angola">Angola - أنغولا</option>
+        <option value="Argentina">Argentina - الأرجنتين</option>
+        {# ... الكثير من الخيارات ... #}
+        <option value="Yemen">Yemen - اليمن</option>
+        <option value="Zambia">Zambia - زامبيا</option>
+        <option value="Zimbabwe">Zimbabwe - زيمبابوي</option>
+    </select>
+</div>
+{% endif %}

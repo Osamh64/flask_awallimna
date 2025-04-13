@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% from "includes/formhelpers.html" import render_field %}
+
+{% block content %}
+<div class="registration-container" style="max-width: 500px; margin: 40px auto; padding: 30px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; margin-bottom: 25px;">إنشاء حساب جديد</h2>
+
+    <form method="POST" action="{{ url_for('auth.register') }}" novalidate id="registration-form">
+        {{ form.hidden_tag() }}
+
+        {{ render_field(form.username, placeholder="اختر اسم مستخدم") }}
+        {{ render_field(form.email, type="email", placeholder="ادخل بريدك الإلكتروني") }}
+
+         {{ render_field(form.password, type="password", placeholder="اختر كلمة مرور قوية") }}
+        {# --- Checklist for Password Criteria --- #}
+         <ul id="password-criteria" style="font-size: 0.9em; list-style: none; padding: 0; margin: -10px 0 10px 15px; color: #666;">
+            <li class="length" data-text="طول 6 أحرف على الأقل">طول 6 أحرف على الأقل</li>
+            <li class="uppercase" data-text="حرف كبير واحد على الأقل">حرف كبير واحد على الأقل</li>
+            <li class="lowercase" data-text="حرف صغير واحد على الأقل">حرف صغير واحد على الأقل</li>
+            <li class="number" data-text="رقم واحد على الأقل">رقم واحد على الأقل</li>
+            {# <li class="symbol" data-text="رمز واحد على الأقل">رمز واحد على الأقل</li> #}
+             <li class="match" data-text="تطابق كلمتي المرور">تطابق كلمتي المرور</li>
+        </ul>
+
+         {{ render_field(form.password2, type="password", placeholder="أعد كتابة كلمة المرور") }}
+        {# Div for match feedback #}
+         <div class="match-feedback" style="font-size: 0.85em; height: 1em; margin-top: -10px; margin-bottom: 10px;"></div>
+
+        {{ render_field(form.role, class="form-select") }} {# Use form-select for Bootstrap styling if needed #}
+
+        {{ render_field(form.accept_terms) }}
+
+
+        <div class="form-group d-grid" style="margin-top: 20px;">
+            {{ form.submit(class="btn btn-primary w-100") }}
+        </div>
+    </form>
+    <div style="text-align: center; margin-top: 15px;">
+        لديك حساب بالفعل؟ <a href="{{ url_for('auth.login') }}">قم بتسجيل الدخول</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/validatePassword.js') }}" defer></script>
+{% endblock %}

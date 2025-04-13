@@ -1,0 +1,30 @@
+{# app/templates/includes/header.html #}
+<header class="site-header">
+    <div class="container header-container"> {# استخدام container داخل الهيدر أيضًا للتوسيط #}
+        <div class="header-left">
+            <a href="{{ url_for('main.index') }}" class="logo-link" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+                <img src="{{ url_for('static', filename='img/Website.jpg') }}" alt="شعار عوالمنا" height="50" width="50" style="border-radius: 50%;">
+                <h1 style="margin: 0; font-size: 1.8em;">عوالمنا</h1>
+            </a>
+        </div>
+
+        {# يمكن إضافة قائمة تنقل رئيسية هنا #}
+        {# <nav> ... </nav> #}
+
+        <div class="header-right" style="display: flex; align-items: center; gap: 15px;">
+            {% if current_user.is_authenticated %}
+                <span style="font-weight: bold;">مرحباً، <a href="{{ url_for('user.profile') }}" style="color: #007bff; text-decoration: none;">{{ current_user.username }}</a>!</span>
+                 {% if current_user.is_admin() %}
+                 <a href="{{ url_for('admin.dashboard') }}" class="btn btn-admin">لوحة التحكم</a>
+                 {% endif %}
+                <a href="{{ url_for('auth.logout') }}" class="btn btn-logout">تسجيل خروج</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-login">تسجيل دخول</a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-register">انشاء حساب</a>
+                <a href="{{ url_for('centers.register') }}" class="btn btn-register-center">تسجيل مركز تعليمي</a>            {% endif %}
+        </div>
+    </div>
+    <!-- شريط التصنيفات -->
+    {% include 'includes/category_nav.html' %}
+</header>
+<br><br> {# مسافة بعد الهيدر مشابهة لـ PHP الأصلي #}

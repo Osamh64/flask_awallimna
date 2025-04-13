@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="center-profile container">
+    <h1 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">ملف مركز: {{ center.name }}</h1>
+
+    <div class="profile-details" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <p><strong>الاسم:</strong> {{ center.name }}</p>
+        <p><strong>البلد:</strong> {{ center.country }}</p> {# يمكن عرض الاسم الكامل للدولة #}
+        <p><strong>بريد التواصل:</strong> {{ center.contact_email }}</p>
+        <p><strong>تاريخ الطلب:</strong> {{ center.submission_date.strftime('%Y-%m-%d') }}</p>
+        <p>
+            <strong>الحالة:</strong>
+            <span class="badge {% if center.status == 'approved' %}bg-success{% elif center.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}" style="padding: 5px 8px; border-radius: 4px; color: white; background-color: {% if center.status == 'approved' %}#28a745{% elif center.status == 'rejected' %}#dc3545{% else %}#ffc107{% endif %}; font-size: 0.9em;">
+                {{ center.status | replace('_', ' ') | title }}
+            </span>
+        </p>
+
+        {% if center.status == 'approved' %}
+             <hr>
+             <h3>المعلمون</h3>
+             {% set teachers = center.teachers.all() %}
+             {% if teachers %}
+                  <ul>
+                     {% for teacher in teachers %}
+                      <li>{{ teacher.email }}</li>
+                     {% endfor %}
+                  </ul>
+             {% else %}
+                 <p>لم يتم إضافة معلمين بعد.</p>
+             {% endif %}
+
+              {# إذا كان المستخدم الحالي هو مدير هذا المركز #}
+             {% if current_user.is_authenticated and current_user.educational_center_id == center.id %}
+                  <a href="{{ url_for('centers.manage_teachers') }}" class="btn btn-secondary" style="margin-top: 15px;">إدارة حسابات المعلمين</a>
+             {% endif %}
+         {% endif %}
+
+    </div>
+     {# إضافة المزيد من التفاصيل أو الإجراءات هنا #}
+</div>
+{% endblock %}

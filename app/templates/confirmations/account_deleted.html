@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container" style="text-align: center; margin-top: 50px;">
+    <div style="background: #f8d7da; color: #721c24; padding: 30px; border: 1px solid #f5c6cb; border-radius: 8px; max-width: 600px; margin: auto;">
+         <h1>تم حذف الحساب بنجاح</h1>
+         <p>لقد تم حذف حسابك وجميع بياناتك المرتبطة به بشكل دائم.</p>
+         <p>نأسف لرحيلك، ونأمل أن نراك مرة أخرى في المستقبل إذا غيرت رأيك.</p>
+         <a href="{{ url_for('main.index') }}" class="btn btn-light" style="margin-top: 20px;">العودة للصفحة الرئيسية</a>
+    </div>
+</div>
+{% endblock %}

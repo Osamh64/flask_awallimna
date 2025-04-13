@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% from "_paginationhelper.html" import render_pagination %}
+
+{% block content %}
+    <h1 style="text-align: center; margin-bottom: 20px;">قصص الأطفال</h1>
+
+    {# أزرار فلترة العمر (بناء على children.php) #}
+     <div class="age-groups" style="text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 10px;">
+            <button onclick="window.location.href='{{ url_for('main.children_page') }}'" class="btn {% if not age_filter %}btn-primary{% else %}btn-light{% endif %}">الكل</button>
+            <button onclick="filterByAge('0-6')" class="btn {% if age_filter == '0-6' %}btn-primary{% else %}btn-light{% endif %}">من 0 إلى 6</button>
+            <button onclick="filterByAge('7-12')" class="btn {% if age_filter == '7-12' %}btn-primary{% else %}btn-light{% endif %}">من 7 إلى 12</button>
+            <button onclick="filterByAge('13-17')" class="btn {% if age_filter == '13-17' %}btn-primary{% else %}btn-light{% endif %}">من 13 إلى 17</button>
+    </div>
+
+
+    <div class="story-list">
+        {% if stories %}
+            {% for story in stories %}
+                 {% include 'includes/story_card.html' %}
+             {% endfor %}
+        {% else %}
+             <p style="text-align: center; color: #777;">لا توجد قصص أطفال منشورة حالياً {% if age_filter %} في هذه الفئة العمرية{% endif %}.</p>
+        {% endif %}
+    </div>
+
+     <!-- Pagination Links -->
+    {% if stories and pagination %}
+        {{ render_pagination(pagination, 'main.children_page', age=age_filter) }}
+     {% endif %}
+
+{% endblock %}
+{# Note: script.js already contains the filterByAge function #}

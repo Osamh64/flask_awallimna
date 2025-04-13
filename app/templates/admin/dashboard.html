@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block head_styles %}
+ <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <section class="admin-info">
+        <h2>لوحة تحكم المشرف</h2>
+         <ul>
+            <li><strong>اسم المشرف:</strong> <span>{{ current_user.username }}</span></li>
+            <li><strong>البريد الإلكتروني:</strong> <span>{{ current_user.email }}</span></li>
+            <li><strong>نوع الحساب:</strong> {{ current_user.role | replace('_', ' ') | title }}</li> {# يعرض الدور بشكل أجمل #}
+        </ul>
+    </section>
+
+    <section class="quick-stats">
+        <h2>نظرة سريعة</h2>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div class="stat-box" style="flex: 1; padding: 15px; background: #e9f7ef; border-radius: 5px; border-right: 4px solid #28a745;">
+                <strong>القصص المعلقة:</strong> <a href="{{ url_for('admin.pending_stories') }}">{{ pending_story_count or 0 }}</a>
+            </div>
+             <div class="stat-box" style="flex: 1; padding: 15px; background: #fff3cd; border-radius: 5px; border-right: 4px solid #ffc107;">
+                <strong>طلبات المراكز:</strong> <a href="{{ url_for('admin.pending_centers') }}">{{ pending_center_count or 0 }}</a>
+            </div>
+             <div class="stat-box" style="flex: 1; padding: 15px; background: #d1ecf1; border-radius: 5px; border-right: 4px solid #17a2b8;">
+                <strong>إجمالي المستخدمين:</strong> <a href="#">{{ user_count or 0 }}</a> {# Add link to user management page #}
+            </div>
+            {# Add more stats as needed #}
+        </div>
+    </section>
+
+    <section class="admin-actions">
+        <h2>إجراءات سريعة</h2>
+         <ul style="list-style: none; padding: 0;">
+            <li style="margin-bottom: 10px;"><a href="{{ url_for('admin.pending_stories') }}" class="btn btn-primary">مراجعة القصص المعلقة</a></li>
+            <li style="margin-bottom: 10px;"><a href="{{ url_for('admin.pending_centers') }}" class="btn btn-primary">مراجعة طلبات المراكز</a></li>
+             {# Add links to manage users, categories, etc. #}
+            {# <li style="margin-bottom: 10px;"><a href="{{ url_for('admin.manage_users') }}" class="btn btn-info">إدارة المستخدمين</a></li> #}
+            {# <li style="margin-bottom: 10px;"><a href="{{ url_for('admin.manage_categories') }}" class="btn btn-info">إدارة التصنيفات</a></li> #}
+             <li style="margin-bottom: 10px;"><a href="{{ url_for('main.statistics') }}" class="btn btn-light">عرض الإحصائيات الكاملة</a></li>
+        </ul>
+    </section>
+</div>
+{% endblock %}

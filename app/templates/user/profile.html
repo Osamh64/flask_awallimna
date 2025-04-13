@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="user-profile container">
+
+     <div class="personal-info" style="background: #fff; padding: 20px; margin-bottom: 30px; border-radius: 8px;">
+          <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 15px;">
+              {# صورة المستخدم الرمزية (مثال) #}
+               <img src="{{ url_for('static', filename='img/default_avatar.png') }}" alt="صورة {{ user.username }}" style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid #eee;">
+               <div>
+                 <h1>ملف: {{ user.username }}</h1>
+                 <p class="text-muted">عضو منذ: {{ user.created_at.strftime('%Y-%m-%d') }} | آخر ظهور: {{ format_time_ago(user.last_seen) }}</p>
+                 <p>الدور: {{ user.role | replace('_', ' ') | title }}</p>
+               </div>
+          </div>
+          <table class="info-table" style="width: 100%; border-collapse: collapse;">
+             <tr><th style="width: 150px; text-align: right; padding: 8px; border-bottom: 1px solid #eee;">الاسم المستخدم:</th><td style="padding: 8px; border-bottom: 1px solid #eee;">{{ user.username }}</td></tr>
+             <tr><th style="text-align: right; padding: 8px; border-bottom: 1px solid #eee;">البريد الإلكتروني:</th><td style="padding: 8px; border-bottom: 1px solid #eee;">{{ user.email }}</td></tr>
+              {# يمكنك إضافة حقول أخرى مثل البلد، تاريخ الميلاد.. إذا أضفتها للمودل #}
+          </table>
+
+          {# أزرار تعديل الحساب (فقط للمستخدم نفسه) #}
+          {% if current_user.is_authenticated and current_user.id == user.id %}
+             <div class="profile-actions" style="margin-top: 20px;">
+                  {# <a href="{{ url_for('user.edit_profile') }}" class="btn btn-secondary">تعديل الملف الشخصي</a> #}
+                  {# <a href="{{ url_for('auth.change_password') }}" class="btn btn-secondary">تغيير كلمة المرور</a> #}
+                   <a href="{{ url_for('user.delete_account') }}" class="btn btn-danger">حذف الحساب</a>
+             </div>
+          {% endif %}
+     </div>
+
+     {# قسم القصص فقط إذا كان المستخدم كاتباً #}
+     {% if user.role == 'writer' %}
+         <section class="user-stories">
+             <h2>
+                  {% if current_user.is_authenticated and current_user.id == user.id %}
+                      قصصي ({{ stories|length }})
+                      <a href="{{ url_for('stories.write_story') }}" class="btn btn-success btn-sm" style="margin-right: 15px;">+ إضافة قصة جديدة</a>
+                 {% else %}
+                      قصص الكاتب ({{ stories|length }})
+                  {% endif %}
+             </h2>
+
+             {% if stories %}
+             <div class="story-list">
+                 {% for story in stories %}
+                 <div class="story-card user-story-item {% if story.status == 'pending' %}story-pending{% elif story.status == 'rejected' %}story-rejected{% endif %}"
+                      style="border-right: 5px solid {% if story.status == 'approved' %}#28a745{% elif story.status == 'pending' %}#ffc107{% elif story.status == 'rejected' %}#dc3545{% else %}#6c757d{% endif %}; padding: 15px; margin-bottom: 15px; background: #fff; border-radius: 4px;">
+                     <h4 style="margin-top: 0;"><a href="{{ url_for('stories.read_story', story_id=story.id) }}">{{ story.title }}</a></h4>
+                     <p class="story-meta" style="font-size: 0.9em;">
+                         <span class="badge" style="padding: 3px 6px; border-radius: 4px; color: white; background-color: {% if story.status == 'approved' %}#28a745{% elif story.status == 'pending' %}#ffc107{% elif story.status == 'rejected' %}#dc3545{% else %}#6c757d{% endif %};">
+                             {% if story.status == 'approved' %}منشورة{% elif story.status == 'pending' %}قيد المراجعة{% elif story.status == 'rejected' %}مرفوضة{% else %}مسودة{% endif %}
+                        </span> |
+                         أُضيفت: {{ format_time_ago(story.submission_date) }} |
+                        مشاهدات: {{ story.view_count or 0 }} |
+                         تقييم: {{ "%.1f"|format(story.average_rating()) }}/5
+                     </p>
+                      {% if story.short_description %}
+                      <p style="font-size: 0.95em; color: #555;">{{ story.short_description | truncate(100) }}</p>
+                      {% endif %}
+                      {# إجراءات خاصة للمالك #}
+                      {% if current_user.is_authenticated and current_user.id == user.id %}
+                          <div class="actions" style="margin-top: 10px;">
+                              <a href="{{ url_for('stories.edit_story', story_id=story.id) }}" class="btn btn-sm btn-light">تعديل</a>
+                              {# يمكنك وضع زر الحذف هنا أيضاً #}
+                              <form action="{{ url_for('stories.delete_story', story_id=story.id) }}" method="POST" style="display: inline-block; margin-right: 5px;">
+                                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                  <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('هل أنت متأكد من حذف هذه القصة نهائياً؟');">حذف</button>
+                              </form>
+                          </div>
+                      {% endif %}
+                  </div>
+                  {% endfor %}
+             </div>
+              {% else %}
+                 <p>لم يقم هذا الكاتب بإضافة أي قصص بعد.</p>
+              {% endif %}
+         </section>
+     {% endif %} {# end if user.role == 'writer' #}
+
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+# requirements.txt
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-WTF
+Flask-Login
+python-dotenv
+mysql-connector-python  # أو psycopg2-binary لـ PostgreSQL، أو اتركه لـ SQLite
+Werkzeug >= 2.0 # للتعامل الأفضل مع file uploads والأمان
+Jinja2
+email-validator # مطلوب لـ Flask-WTF للتحقق من الإيميل
+
+# اختياري (إذا كنت ستستخدم إرسال البريد)
+# Flask-Mail

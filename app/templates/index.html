@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2 class="new_story" style="text-align: center; margin-bottom: 20px;">أحدث القصص</h2>
+
+    <div class="story-list">
+        {% if stories %}
+            {% for story in stories %}
+                {% include 'includes/_story_card.html' %} {# استخدام snippet لعرض كل قصة #}
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: #777;">لا توجد قصص منشورة حالياً.</p>
+        {% endif %}
+    </div>
+
+     <!-- Pagination Links -->
+     <nav aria-label="Page navigation">
+         <ul class="pagination justify-content-center" style="list-style: none; display: flex; padding: 0; gap: 10px; margin-top: 20px;">
+             <li class="page-item {% if not prev_url %}disabled{% endif %}" style="margin: 0 5px;">
+                 <a class="page-link" href="{{ prev_url or '#' }}" tabindex="-1" aria-disabled="true" style="padding: 8px 12px; border: 1px solid #ddd; text-decoration: none; {% if not prev_url %}color: #aaa; pointer-events: none;{% else %}color: #007bff;{% endif %}">السابق</a>
+             </li>
+             {# يمكن إضافة أرقام الصفحات هنا إذا لزم الأمر #}
+             <li class="page-item {% if not next_url %}disabled{% endif %}" style="margin: 0 5px;">
+                 <a class="page-link" href="{{ next_url or '#' }}" style="padding: 8px 12px; border: 1px solid #ddd; text-decoration: none; {% if not next_url %}color: #aaa; pointer-events: none;{% else %}color: #007bff;{% endif %}">التالي</a>
+             </li>
+         </ul>
+     </nav>
+
+{% endblock %}

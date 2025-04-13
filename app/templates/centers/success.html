@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="success-box" style="background: #d4edda; color: #155724; padding: 40px; border-radius: 15px; border: 2px solid #c3e6cb; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; max-width: 600px; margin: 50px auto;">
+    <h2 style="color: #4CAF50; margin-bottom: 20px;">{{ page_title or 'نجاح!' }}</h2>
+    <p style="font-size: 1.2em; margin: 20px 0;">{{ message or 'تمت العملية بنجاح.' }}</p>
+
+    {# إضافة تفاصيل إذا وجدت، مثل اسم المركز #}
+    {% if center_name %}
+        <p>المركز: <strong>{{ center_name }}</strong></p>
+    {% endif %}
+
+    {% if details %}
+        <p style="margin-top: 15px; color: #444;">{{ details }}</p>
+    {% endif %}
+
+    <a href="{{ url_for('main.index') }}" class="btn" style="background: #4CAF50; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-size: 16px; display: inline-block; margin-top: 25px;">
+        العودة إلى الصفحة الرئيسية
+    </a>
+</div>
+{% endblock %}

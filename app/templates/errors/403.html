@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div style="text-align: center; margin-top: 50px;">
+        <h1 style="color: #dc3545;">403 - الوصول مرفوض</h1>
+        <p style="font-size: 1.2em;">ليس لديك الصلاحية اللازمة للوصول إلى هذه الصفحة.</p>
+        <p><a href="{{ url_for('main.index') }}">العودة إلى الصفحة الرئيسية</a></p>
+        {% if current_user.is_authenticated %}
+         <p><small>المستخدم المسجل: {{ current_user.username }} (الدور: {{ current_user.role }})</small></p>
+        {% else %}
+         <p><small>لم يتم تسجيل دخولك. <a href="{{ url_for('auth.login', next=request.path) }}">تسجيل الدخول؟</a></small></p>
+        {% endif %}
+    </div>
+{% endblock %}

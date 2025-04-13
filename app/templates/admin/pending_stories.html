@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% from "_paginationhelper.html" import render_pagination %} {# Helper لعرض الترقيم #}
+
+{% block head_styles %}
+ <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_style.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h2 style="border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; margin-bottom: 25px;">القصص المعلقة بانتظار المراجعة</h2>
+
+    <!-- منطقة عرض رسائل التغذية الراجعة (AJAX) -->
+    <div id="general-feedback" class="feedback-message"></div>
+
+    {% if stories %}
+    <ul id="pending-stories-list" style="list-style: none; padding: 0;">
+        {% for story in stories %}
+        <li class="story-item" id="story-{{ story.id }}" data-story-id="{{ story.id }}">
+            <div class="info">
+                <span class="title"><a href="{{ url_for('stories.read_story', story_id=story.id) }}" target="_blank" title="عرض القصة في صفحة جديدة">{{ story.title }}</a></span>
+                <span class="author">بواسطة: <a href="{{ url_for('user.view_profile', username=story.author_name) }}">{{ story.author_name }}</a></span>
+                <span class="time-ago">{{ format_time_ago(story.submission_date) }}</span>
+                 {% if story.pdf_path %}
+                 <a href="{{ url_for('stories.serve_story_pdf', filename=story.pdf_path) }}" target="_blank" style="font-size: 0.9em; color: #888;">[عرض PDF]</a>
+                 {% endif %}
+            </div>
+            <div class="actions">
+                <button class="approve-button" title="قبول هذه القصة">قبول</button>
+                <button class="reject-button" title="رفض هذه القصة">رفض</button>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- عرض الترقيم -->
+     {{ render_pagination(pagination, 'admin.pending_stories') }}
+
+    {% else %}
+    <p id="no-stories-message" style="text-align: center; color: #6c757d; padding: 30px; font-size: 1.15em; background-color: #f8f9fa; border: 1px dashed #ced4da; border-radius: 6px;">لا توجد قصص بحاجة للمراجعة في الوقت الحالي.</p>
+    {% endif %}
+{% endblock %}
+
+{% block scripts %}
+ <script src="{{ url_for('static', filename='js/admin_script.js') }}" defer></script>
+ <script>
+    // يمكنك وضع CSRF Token هنا ليستخدمه admin_script.js إذا كان مطلوباً لـ API POST
+    const csrfToken = "{{ csrf_token() }}";
+ </script>
+{% endblock %}

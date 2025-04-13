@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="confirmation-box" style="max-width: 600px; margin: 50px auto; text-align: center; padding: 30px; background: #fff; border: 1px solid #eee; border-radius: 8px;">
+    <h2>تم إرسال البريد الإلكتروني</h2>
+    <p style="font-size: 1.1em; margin-top: 15px;">
+        تم إرسال التعليمات إلى بريدك الإلكتروني المسجل {% if email %}<strong dir="ltr">{{ email }}</strong>{% endif %}.
+        <br>
+        يرجى التحقق من صندوق الوارد (والبريد المزعج/spam) للمتابعة.
+    </p>
+     <p style="margin-top: 20px;"><a href="{{ url_for('main.index') }}" class="btn btn-light">العودة للصفحة الرئيسية</a></p>
+</div>
+{% endblock %}

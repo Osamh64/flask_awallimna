@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- عنوان الصفحة يأتي من الـ render_template أو يكون افتراضي -->
+    <title>{{ title or 'عوالمنا' }}</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/Website.jpg') }}">
+    <!-- تحميل ملف CSS الأساسي -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- يمكن إضافة روابط CSS إضافية في blocks -->
+    {% block head_styles %}{% endblock %}
+    <meta name="description" content="اكتشف عوالمًا لا حدود لها من الخيال والإبداع على موقعنا، حيث يلتقي الكتّاب والقرّاء ليشاركوا قصصهم ورواياتهم في مساحة آمنة وملهمة.">
+    <meta name="keywords" content="قصص, روايات, قصص عالمية, روايات عالمية, كتب, أدب, كتّاب, قرّاء, إبداع, خيال, مغامرة, غموض, علمي, حب, مسابقات كتابية, منصة كتابية, تبادل القصص, تحديات كتابية, منصة روايات, كتابة, كتابة قصص, كتابة روايات, تأليف, مشاركة قصص, مشاركة روايات, موقع أدبي, موقع قصص, موقع روايات, منصة أدبية, منصة قصص, منصة روايات, مجتمع أدبي, مجتمع كتابي, مجتمع قراءة, تفاعل أدبي, تفاعل كتابي, تفاعل قراءة, إلهام كتابي, إلهام قصص, إلهام روايات, تنمية مهارات كتابية, تنمية مهارات قصصية, تنمية مهارات روائية">
+
+</head>
+<body>
+    <!-- تضمين الهيدر -->
+    {% include 'includes/header.html' %}
+
+    <main class="container"> <!-- استخدام container لبعض التنسيق العام -->
+        <!-- رسائل Flash للمستخدم -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages" style="padding: 10px 0;">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category or 'info' }}" role="alert" style="padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; background-color: #f8f9fa; color: #333;">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="float: left; background: none; border: none; font-size: 1.2em; cursor: pointer;" onclick="this.parentElement.style.display='none';">×</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- المحتوى المحدد لكل صفحة -->
+        {% block content %}
+            <p>محتوى الصفحة يظهر هنا...</p>
+        {% endblock %}
+    </main>
+
+    <!-- تضمين الفوتر -->
+    {% include 'includes/footer.html' %}
+
+    <!-- تحميل ملفات JavaScript الأساسية -->
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+    <!-- تحميل ملفات JS إضافية -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

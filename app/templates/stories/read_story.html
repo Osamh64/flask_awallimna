@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<article class="story-view container">
+    <header style="margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+        <h1>{{ story.title }}</h1>
+        <div class="story-meta">
+            بواسطة <a href="{{ url_for('user.view_profile', username=story.author_name) }}">{{ story.author_name }}</a> |
+            نُشر في: {{ story.publish_date.strftime('%Y-%m-%d') if story.publish_date else 'لم تُنشر بعد' }} |
+             مشاهدات: {{ story.view_count }} |
+            متوسط التقييم: {{ "%.1f"|format(avg_rating) }}/5 ({{ ratings|length }} تقييم)
+        </div>
+         {# عرض التصنيفات #}
+         {% if story.categories.count() > 0 %}
+          <p style="font-size: 0.9em; color: #777; margin-top: 10px;">
+              التصنيفات:
+              {% for category in story.categories %}
+              <a href="{{ url_for('main.category_page', category_slug=category.slug) }}" style="background-color: #f0f0f0; padding: 2px 8px; border-radius: 10px; text-decoration: none; color: #555; margin-right: 5px;">{{ category.name }}</a>
+              {% endfor %}
+          </p>
+         {% endif %}
+         {# أزرار التحكم إذا كان المالك أو الأدمن #}
+         {% if current_user.is_authenticated and (current_user.id == story.author_id or current_user.is_admin()) %}
+             <div class="story-actions" style="margin-top: 15px;">
+                  <a href="{{ url_for('stories.edit_story', story_id=story.id) }}" class="btn btn-sm btn-secondary">تعديل</a>
+                   <form action="{{ url_for('stories.delete_story', story_id=story.id) }}" method="POST" style="display: inline-block; margin-right: 5px;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('هل أنت متأكد من حذف هذه القصة نهائياً؟');">حذف</button>
+                  </form>
+              </div>
+          {% endif %}
+    </header>
+
+    {# --- عرض محتوى القصة --- #}
+    <section class="story-content">
+        {% if story.content %}
+             <div class="text-content" style="line-height: 1.8; margin-bottom: 30px; background: #fff; padding: 20px; border-radius: 5px;">
+                  {# تحويل النص البسيط إلى فقرات (إذا كان markdown ستحتاج لمكتبة أخرى) #}
+                  {{ story.content | replace('\n', '<br>') | safe }}
+              </div>
+        {% elif story.pdf_path %}
+            {# خيار 1: رابط تحميل مباشر #}
+            <div style="margin-bottom: 30px; padding: 20px; background-color: #f0f8ff; border-radius: 5px; text-align:center;">
+                 <p>يمكنك قراءة هذه القصة كملف PDF.</p>
+                 <a href="{{ url_for('stories.serve_story_pdf', filename=story.pdf_path) }}" target="_blank" class="btn btn-primary">فتح ملف PDF في تبويب جديد</a>
+            </div>
+
+            {# خيار 2: تضمين عارض PDF (إذا حملت المكتبة وقمت بالإعداد) #}
+            {# تحتاج لإضافة مكتبة pdf.js في layout.html أو هنا #}
+             <div id="pdf-viewer" style="margin-bottom: 30px; border: 1px solid #ccc; padding: 10px; background: #eee; min-height: 400px; position: relative;">
+                  جاري تحميل PDF... (تأكد من تحميل مكتبة PDF.js)
+             </div>
+             {# لتمرير رابط PDF إلى script.js #}
+              {% if pdf_url %}
+             <div id="pdf-data" data-pdf-url="{{ pdf_url }}" style="display: none;"></div>
+             {% endif %}
+         {% else %}
+            <p style="text-align: center; color: #888;">لا يوجد محتوى نصي أو ملف PDF لهذه القصة.</p>
+        {% endif %}
+    </section>
+
+
+    {# --- قسم التقييمات والتعليقات --- #}
+    <section class="story-ratings" style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
+        <h3>التقييمات والتعليقات ({{ ratings|length }})</h3>
+
+        {# -- نموذج إضافة تقييم جديد -- #}
+        {# {% if can_rate %}
+            <div class="add-rating-form" style="margin-bottom: 25px;">
+                 <h4>أضف تقييمك</h4>
+                 <form method="POST" action="{{ url_for('stories.add_rating', story_id=story.id) }}">
+                      {{ rating_form.hidden_tag() }}
+                     <div class="form-group">
+                          {{ rating_form.rating.label }}
+                          {# اعرض نجوم أو قائمة منسدلة للتقييم #}
+                           {{ rating_form.rating(class="form-control", style="max-width: 100px;") }}
+                          {% if rating_form.rating.errors %}<div class="invalid-feedback d-block">{% for error in rating_form.rating.errors %}<span>{{ error }}</span><br>{% endfor %}</div>{% endif %}
+                     </div>
+                     <div class="form-group">
+                           {{ rating_form.comment.label }}
+                          {{ rating_form.comment(rows="3", class="form-control") }}
+                          {% if rating_form.comment.errors %}<div class="invalid-feedback d-block">{% for error in rating_form.comment.errors %}<span>{{ error }}</span><br>{% endfor %}</div>{% endif %}
+                     </div>
+                      {{ rating_form.submit(class="btn btn-success") }}
+                 </form>
+                 <hr>
+            </div>
+        {% elif current_user.is_authenticated %}
+             <p style="font-style: italic; color: #555; margin-bottom: 20px;">لقد قمت بتقييم هذه القصة مسبقاً.</p>
+        {% else %}
+             <p style="margin-bottom: 20px;"><a href="{{ url_for('auth.login', next=request.url) }}">قم بتسجيل الدخول</a> لإضافة تقييمك.</p>
+        {% endif %} #}
+
+         {# -- عرض التقييمات الحالية -- #}
+        {% if ratings %}
+        <div class="ratings-list">
+            {% for rating in ratings %}
+            <div class="rating-item" style="border-bottom: 1px dashed #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                 <p><strong>{{ rating.rater.username }}</strong> - <span style="color: #ffc107;">{{ '★' * rating.rating }}{{ '☆' * (5-rating.rating) }}</span> <small class="text-muted" style="margin-right: 10px;">({{ format_time_ago(rating.timestamp) }})</small></p>
+                {% if rating.comment %}
+                <p style="margin-top: 5px; color: #555;">{{ rating.comment | replace('\n', '<br>') | safe }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>لا توجد تقييمات لهذه القصة بعد.</p>
+        {% endif %}
+
+    </section>
+
+</article>
+{% endblock %}
+
+{% block scripts %}
+    {# تحميل PDF.js هنا إذا لزم الأمر (يفضل في layout.html) #}
+    {# <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/NlU6WvyIbXnqJBwdTVkTwjWQsGemXzvtsESZZMkEZLuJs6JG1zV2A7KNYdxhQDnKc9rTclFQSsA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> #}
+    {# <script src="{{ url_for('static', filename='js/pdf.worker.min.js') }}"></script> #}
+
+    {# script.js العام سيقوم بالتعامل مع العارض إذا وجد العنصر والـ URL #}
+
+{% endblock %}

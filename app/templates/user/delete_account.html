@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% from "includes/formhelpers.html" import render_field %}
+
+{% block content %}
+<div class="delete-account-container" style="max-width: 600px; margin: 40px auto; padding: 30px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+    <h1 style="color: #dc3545; text-align: center; margin-bottom: 15px;">حذف الحساب</h1>
+    <p style="text-align: center; color: #555; margin-bottom: 25px;">تحذير: عملية الحذف النهائي لا يمكن التراجع عنها وستؤدي إلى إزالة جميع بياناتك وقصصك بشكل دائم.</p>
+
+    {# استخدام نفس الفورم لـ GET و POST #}
+    <form method="POST" action="{{ url_for('user.delete_account') }}" novalidate id="delete-account-form">
+         {{ form.hidden_tag() }}
+        {{ form.action() }} {# الحقل المخفي لتحديد freeze/delete بالـ JS #}
+
+         {{ render_field(form.reason) }} {# Radio buttons #}
+
+         {{ render_field(form.additional_info, rows=4, placeholder="أي معلومات إضافية ترغب بمشاركتها؟ (اختياري)") }}
+
+         {{ render_field(form.confirm_password, type="password", placeholder="ادخل كلمة مرورك الحالية للتأكيد") }}
+
+         <hr style="margin: 25px 0;">
+
+         <div style="display: flex; justify-content: space-between; gap: 15px;">
+             {# الأزرار الآن ترسل نفس الفورم ولكن مع قيمة مختلفة #}
+              {# <button type="submit" name="action" value="freeze" class="btn btn-warning">تجميد الحساب (تسجيل الخروج)</button> #}
+             {# تحديث لاستخدام JS لتحديد الزر المضغوط #}
+              <button type="submit" id="submit-freeze-btn" class="btn btn-warning">تجميد الحساب (تسجيل الخروج)</button>
+             <button type="submit" id="submit-delete-btn" class="btn btn-danger">تأكيد الحذف النهائي للحساب</button>
+         </div>
+    </form>
+</div>
+{% endblock %}
+
+ {% block scripts %}
+ <script>
+  // تحديد قيمة الحقل المخفي 'action' بناءً على الزر الذي تم الضغط عليه
+  const form = document.getElementById('delete-account-form');
+  const actionInput = form.querySelector('input[name="action"]');
+  const freezeBtn = document.getElementById('submit-freeze-btn');
+  const deleteBtn = document.getElementById('submit-delete-btn');
+
+  if(freezeBtn) {
+       freezeBtn.addEventListener('click', function(e) {
+           if(actionInput) actionInput.value = 'freeze';
+           // لا تحتاج لـ e.preventDefault() إلا إذا كان الزر ليس type="submit"
+       });
+  }
+  if(deleteBtn) {
+       deleteBtn.addEventListener('click', function(e) {
+            if(actionInput) actionInput.value = 'delete';
+            // التأكيد الأخير قبل إرسال طلب الحذف النهائي
+            if (!confirm('تحذير!\nهل أنت متأكد من رغبتك في حذف حسابك نهائياً؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                e.preventDefault(); // منع إرسال الفورم
+            }
+       });
+  }
+ </script>
+ {% endblock %}

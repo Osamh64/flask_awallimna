@@ -1,0 +1,16 @@
+{# app/templates/includes/category_nav.html #}
+{# يتم حقن categories_for_nav عبر context_processor في __init__.py #}
+{% if categories_for_nav %}
+<div class="category-box" style="border-radius: 25px; background-color: #eee; padding: 15px; margin-top: 10px;">
+    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 15px;">
+        {% for category in categories_for_nav %}
+             {# استخدام slug لإنشاء الرابط #}
+             <li><a href="{{ url_for('main.category_page', category_slug=category.slug) }}" class="category-title" style="text-decoration: none; color: #337ab7; padding: 5px 10px; border-radius: 15px; background-color: #fff; display: inline-block; transition: background-color 0.2s;">{{ category.name }}</a></li>
+        {% endfor %}
+         {# إضافة رابط الأطفال بشكل خاص إذا لم يكن تصنيفاً عادياً #}
+         <li><a href="{{ url_for('main.children_page') }}" class="category-title" style="text-decoration: none; color: #337ab7; padding: 5px 10px; border-radius: 15px; background-color: #fff; display: inline-block; transition: background-color 0.2s;">أطفال</a></li>
+
+    </ul>
+</div>
+<br> {# مسافة بعد شريط التصنيفات #}
+{% endif %}

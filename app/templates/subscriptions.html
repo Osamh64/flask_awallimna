@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container subscription-page">
+    <h1 style="text-align: center; margin-bottom: 30px;">خطط الاشتراك</h1>
+     <p style="text-align: center; color: #555; margin-bottom: 40px;">اختر الخطة التي تناسب احتياجاتك للاستمتاع بمميزات إضافية في عوالمنا.</p>
+
+    <div class="subscription-cards" style="display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;">
+
+        {# --- بطاقة اشتراك 1: شهري --- #}
+        <div class="card" style="flex: 1; min-width: 280px; max-width: 350px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; padding: 25px; background: #fff;">
+             <h2 style="font-size: 1.5em; color: #007bff; margin-bottom: 15px;">الخطة الشهرية</h2>
+             <p class="price" style="font-size: 2em; font-weight: bold; color: #333; margin-bottom: 10px;">10$ <span style="font-size: 0.5em; color: #777;">/ شهر</span></p>
+            <p style="color: #666; margin-bottom: 20px;">اشتراك متجدد شهرياً</p>
+            <ul style="list-style: none; padding: 0; margin-bottom: 25px; text-align: right;">
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> مشاهدة صاحب الرواية ومتابعته</li>
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> كتابة تعليق</li>
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> تقييم الرواية</li>
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> ميزة الاستماع للقصة (إن وجدت)</li>
+                 {# أضف ميزات أخرى #}
+                 <li style="margin-bottom: 8px; color: #aaa;"><span style="color: gray; margin-left: 5px;">✗</span> وصول غير محدود</li>
+            </ul>
+             {# الرابط هنا يجب أن يوجه إلى عملية الدفع/التفعيل #}
+            <button class="btn btn-primary" style="width: 100%;">اختيار الخطة الشهرية</button>
+        </div>
+
+        {# --- بطاقة اشتراك 2: سنوي --- #}
+        <div class="card card-popular" style="flex: 1; min-width: 280px; max-width: 350px; border: 2px solid #28a745; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; padding: 25px; background: #f8f9fa; position: relative;">
+             <span style="position: absolute; top: -15px; right: 20px; background: #28a745; color: white; padding: 3px 10px; border-radius: 15px; font-size: 0.8em;">الأكثر توفيراً</span>
+            <h2 style="font-size: 1.5em; color: #28a745; margin-bottom: 15px;">الخطة السنوية</h2>
+            <p class="price" style="font-size: 2em; font-weight: bold; color: #333; margin-bottom: 10px;">100$ <span style="font-size: 0.5em; color: #777;">/ سنة</span></p>
+            <p style="color: #666; margin-bottom: 20px;">وفر أكثر بالدفع السنوي!</p>
+            <ul style="list-style: none; padding: 0; margin-bottom: 25px; text-align: right;">
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> مشاهدة صاحب الرواية ومتابعته</li>
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> كتابة تعليق</li>
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> تقييم الرواية</li>
+                <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> ميزة الاستماع للقصة (إن وجدت)</li>
+                 {# أضف ميزات أخرى #}
+                 <li style="margin-bottom: 8px;"><span style="color: green; margin-left: 5px;">✓</span> وصول غير محدود لجميع المحتوى</li>
+            </ul>
+            {# الرابط هنا يجب أن يوجه إلى عملية الدفع/التفعيل #}
+             <button class="btn btn-success" style="width: 100%;">اختيار الخطة السنوية</button>
+        </div>
+
+        {# --- بطاقة اشتراك المركز التعليمي --- #}
+        <div class="card card-enterprise" style="flex: 1 1 100%; max-width: 600px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; padding: 25px; background: #fff; margin-top: 20px;">
+            <h2 style="font-size: 1.5em; color: #6f42c1; margin-bottom: 15px;">اشتراك المركز التعليمي</h2>
+            <p style="color: #666; margin-bottom: 20px;">خطط مخصصة للمؤسسات التعليمية والمدارس والمراكز.</p>
+             <p>يرجى التواصل معنا للحصول على عرض أسعار مخصص بناءً على عدد المستخدمين والميزات المطلوبة.</p>
+             <a href="{{ url_for('centers.register_center') }}" class="btn" style="background-color: #6f42c1; color: white; margin-top: 20px;">تسجيل مركز تعليمي</a>
+              {# أو رابط لصفحة "اتصل بنا" للمبيعات #}
+              {# <a href="#contact" class="btn" style="background-color: #6f42c1; color: white; margin-top: 20px;">تواصل مع المبيعات</a> #}
+        </div>
+    </div>
+
+    {# يمكن إضافة قسم للأسئلة الشائعة حول الاشتراكات هنا #}
+
+</div>
+{% endblock %}

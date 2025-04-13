@@ -1,0 +1,27 @@
+{# app/templates/includes/_story_card.html - Snippet لعرض القصة #}
+<div class="story-card" style="border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 20px; background-color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+    <h3 style="margin-top: 0;">
+        <a href="{{ url_for('stories.read_story', story_id=story.id) }}" style="color: #333; text-decoration: none;">{{ story.title }}</a>
+    </h3>
+    <p style="color: #555;">
+        بواسطة: <a href="{{ url_for('user.view_profile', username=story.author_name) }}" style="color: #007bff; text-decoration: none;">{{ story.author_name }}</a>
+        {% if story.publish_date %}
+        <span style="color: #888; font-size: 0.9em; margin-right: 10px;"> - نُشر {{ format_time_ago(story.publish_date) }}</span>
+        {% elif story.submission_date %}
+         <span style="color: #888; font-size: 0.9em; margin-right: 10px;"> - أُرسل {{ format_time_ago(story.submission_date) }}</span>
+         {% endif %}
+         <span style="color: #888; font-size: 0.9em;">- مشاهدات: {{ story.view_count or 0 }}</span>
+    </p>
+    {% if story.short_description %}
+        <p style="color: #666;">{{ story.short_description | truncate(150) }}</p> {# عرض وصف مختصر #}
+    {% endif %}
+    {% if story.categories.count() > 0 %}
+     <p style="font-size: 0.9em; color: #777;">
+         التصنيفات:
+         {% for category in story.categories %}
+         <a href="{{ url_for('main.category_page', category_slug=category.slug) }}" style="background-color: #f0f0f0; padding: 2px 8px; border-radius: 10px; text-decoration: none; color: #555; margin-right: 5px;">{{ category.name }}</a>
+         {% endfor %}
+     </p>
+     {% endif %}
+    <a href="{{ url_for('stories.read_story', story_id=story.id) }}" class="btn btn-primary" style="display: inline-block; padding: 8px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">قراءة القصة</a>
+</div>

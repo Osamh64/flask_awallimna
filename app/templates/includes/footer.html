@@ -1,0 +1,17 @@
+<!-- app/templates/includes/footer.html -->
+<footer class="site-footer mt-5 py-3 bg-light text-center"> {# يمكنك إضافة تنسيق هنا أو في CSS #}
+    <div class="container">
+        <p class="text-muted m-0"> {# استخدمت تنسيق Bootstrap كمثال #}
+            {# قم بالوصول إلى خاصية .year مباشرة بدون أقواس () #}
+            © {{ now.year }} عوالمنا. جميع الحقوق محفوظة.
+        </p>
+       {# يمكن إضافة روابط مفيدة أخرى هنا #}
+   </div>
+</footer>
+
+{# الحصول على السنة الحالية في Jinja2 - نحتاج لتمرير الدالة أو كائن datetime #}
+{# يتم افتراض أن now() متاحة. إذا لم تكن كذلك، يمكن تمريرها من route #}
+{# أو استخدام JavaScript إذا كان الأمر بسيطاً #}
+{% macro current_year() -%}
+    <script>document.write(new Date().getFullYear());</script>
+{%- endmacro %}

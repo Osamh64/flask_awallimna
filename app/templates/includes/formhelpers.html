@@ -1,0 +1,103 @@
+{# app/templates/includes/formhelpers.html - Workaround v2 - No **kwargs in signature #}
+{% macro render_field(field, class=None, placeholder=None, type=None, required=None, value=None ) %} {# Explicit args #}
+
+  {# استخراج معلومات الحقل الأساسية #}
+  {% set field_id = field.id %}
+  {% set field_name = field.name %}
+  {% set field_label = field.label %}
+  {% set field_errors = field.errors %}
+  {% set field_type = field.type %} {# اسم نوع حقل WTForms #}
+  {% set default_value = value if value is not none else (field.data if field.data is not none else '') %}
+
+  {# --- تحديد الكلاسات --- #}
+  {% set effective_class = [] %}
+  {% if field_type == 'BooleanField' %}
+      {% set _ = effective_class.append('form-check-input') %}
+  {% elif field_type != 'SubmitField' %}
+      {% set _ = effective_class.append('form-control') %}
+  {% endif %}
+  {% if class %} {# استخدام الكلاس الممرر صراحةً #}
+      {% set _ = effective_class.append(class) %}
+  {% endif %}
+  {% if field_errors %}
+      {% set _ = effective_class.append('is-invalid') %} {# كلاس Bootstrap للإشارة للخطأ #}
+  {% endif %}
+  {% set class_string = " ".join(effective_class) %}
+
+  {# --- تحديد الـ placeholder --- #}
+  {% set effective_placeholder = placeholder %} {# استخدام الـ placeholder الممرر صراحةً أولاً #}
+  {% if effective_placeholder is none and field_type not in ['SubmitField', 'CSRFTokenField', 'HiddenField', 'BooleanField'] %}
+       {% set effective_placeholder = field_label.text %} {# إذا لم يمرر، استخدم نص الوسم #}
+  {% endif %}
+
+  {# --- تحديد نوع حقل الإدخال HTML --- #}
+  {% set effective_type = type %} {# استخدام النوع الممرر صراحةً أولاً #}
+  {% if not effective_type %} {# إذا لم يمرر، حاول تحديده من نوع حقل WTForms #}
+    {% if field_type == 'EmailField' %} {% set effective_type = 'email' %}
+    {% elif field_type == 'PasswordField' %} {% set effective_type = 'password' %}
+    {% elif field_type == 'IntegerField' %} {% set effective_type = 'number' %}
+    {% elif field_type == 'DecimalField' %} {% set effective_type = 'number' %}
+    {% elif field_type == 'DateField' %} {% set effective_type = 'date' %}
+    {% elif field_type == 'DateTimeField' %} {% set effective_type = 'datetime-local' %}
+    {% elif field_type == 'URLField' %} {% set effective_type = 'url' %}
+    {% elif field_type == 'BooleanField' %} {% set effective_type = 'checkbox' %}
+    {% elif field_type == 'SubmitField' %} {% set effective_type = 'submit' %}
+    {% else %} {% set effective_type = 'text' %} {# الافتراضي (StringField, etc.) #}
+    {% endif %}
+  {% endif %}
+
+  {# --- تحديد خاصية required --- #}
+  {# نستخدم required الممرر صراحةً، أو نتحقق من خاصية required في حقل WTForms #}
+  {% set is_required = required if required is not none else field.flags.required %}
+
+  {# --- بناء عنصر النموذج HTML --- #}
+  <div class="form-group mb-3">
+    {# عرض الوسم (Label)، ما عدا لبعض الحقول #}
+    {% if field_type not in ['HiddenField', 'CSRFTokenField', 'SubmitField', 'BooleanField'] %}
+        {{ field_label(for=field_id, class="form-label") }}
+    {% endif %}
+
+    {# بناء عنصر الإدخال نفسه بناءً على نوعه #}
+    {% if field_type == 'BooleanField' %}
+      <div class="form-check">
+        {# بناء input checkbox يدويًا #}
+        <input type="{{ effective_type }}" class="{{ class_string }}" name="{{ field_name }}" id="{{ field_id }}" {% if default_value == True or default_value|string|lower == 'true' %}checked{% endif %} {% if is_required %}required{% endif %}>
+        {{ field_label(for=field_id, class="form-check-label") }}
+      </div>
+    {% elif field_type == 'TextAreaField' %}
+         {# بناء textarea يدويًا #}
+         <textarea name="{{ field_name }}" id="{{ field_id }}" class="{{ class_string }}" placeholder="{{ effective_placeholder if effective_placeholder }}" {% if is_required %}required{% endif %}>{{ default_value }}</textarea>
+    {% elif field_type == 'SelectField' %}
+         {# بناء select يدويًا #}
+         <select name="{{ field_name }}" id="{{ field_id }}" class="{{ class_string }}" {% if is_required %}required{% endif %}>
+             {% for val, lbl in field.choices %} {# المرور على الخيارات #}
+                 <option value="{{ val }}" {% if val|string == default_value|string %}selected{% endif %}>{{ lbl }}</option>
+             {% endfor %}
+         </select>
+    {% elif field_type == 'RadioField' %}
+        {# عرض حقول الراديو - قد يحتاج لتنسيق إضافي #}
+        {% for subfield in field %} {# WTForms يعامل RadioField كمجموعة حقول فرعية #}
+        <div class="form-check">
+           {{ subfield(class=class_string.replace('form-control', 'form-check-input')) }} {# تعديل الكلاس ليناسب الراديو #}
+           {{ subfield.label(class="form-check-label") }}
+        </div>
+        {% endfor %}
+   {% elif field_type == 'SubmitField' %}
+         {# بناء زر الإرسال يدويًا #}
+         <input type="{{ effective_type }}" name="{{ field_name }}" id="{{ field_id }}" value="{{ field_label.text }}" class="{{ class_string if class_string else 'btn btn-primary' }}">
+    {% else %} {# بناء input افتراضي لمعظم الأنواع الأخرى #}
+        <input type="{{ effective_type }}" name="{{ field_name }}" id="{{ field_id }}" value="{{ default_value }}" class="{{ class_string }}" placeholder="{{ effective_placeholder if effective_placeholder }}" {% if is_required %}required{% endif %}>
+    {% endif %}
+
+    {# عرض رسائل الخطأ إذا وجدت #}
+    {% if field_errors %}
+      <div class="invalid-feedback d-block"> {# استخدام d-block لضمان ظهور الخطأ تحت الحقل #}
+        {% for error in field_errors %}
+          <span>{{ error }}</span><br>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}
+{# --- نهاية الماكرو --- #}
+{# --- نهاية الملف --- #}

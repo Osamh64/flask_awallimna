@@ -1,0 +1,38 @@
+{# _paginationhelper.html #}
+{% macro render_pagination(pagination, endpoint) %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center" style="list-style: none; display: flex; padding: 0; gap: 10px; margin-top: 20px;">
+      {# زر السابق #}
+      <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}" style="margin: 0 5px;">
+        <a class="page-link" href="{% if pagination.has_prev %}{{ url_for(endpoint, page=pagination.prev_num, **request.view_args) }}{% else %}#{% endif %}" tabindex="-1" aria-disabled="true" style="padding: 8px 12px; border: 1px solid #ddd; text-decoration: none; {% if not pagination.has_prev %}color: #aaa; pointer-events: none;{% else %}color: #007bff;{% endif %}">
+          « السابق
+        </a>
+      </li>
+
+      {# عرض أرقام الصفحات (اختياري وممكن تبسيطه أو تعقيده) #}
+      {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if p %}
+          {% if p == pagination.page %}
+          <li class="page-item active" aria-current="page" style="margin: 0 5px;">
+            <span class="page-link" style="padding: 8px 12px; border: 1px solid #007bff; background-color: #007bff; color: white; text-decoration: none;">{{ p }}</span>
+          </li>
+          {% else %}
+          <li class="page-item" style="margin: 0 5px;">
+            <a class="page-link" href="{{ url_for(endpoint, page=p, **request.view_args) }}" style="padding: 8px 12px; border: 1px solid #ddd; color: #007bff; text-decoration: none;">{{ p }}</a>
+          </li>
+          {% endif %}
+        {% else %}
+            {# نقاط (...) #}
+            <li class="page-item disabled" style="margin: 0 5px;"><span class="page-link" style="padding: 8px 12px; border: 1px solid #ddd; color: #aaa; text-decoration: none;">…</span></li>
+        {% endif %}
+      {% endfor %}
+
+      {# زر التالي #}
+      <li class="page-item {% if not pagination.has_next %}disabled{% endif %}" style="margin: 0 5px;">
+        <a class="page-link" href="{% if pagination.has_next %}{{ url_for(endpoint, page=pagination.next_num, **request.view_args) }}{% else %}#{% endif %}" style="padding: 8px 12px; border: 1px solid #ddd; text-decoration: none; {% if not pagination.has_next %}color: #aaa; pointer-events: none;{% else %}color: #007bff;{% endif %}">
+          التالي »
+        </a>
+      </li>
+    </ul>
+  </nav>
+{% endmacro %}

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% from "_paginationhelper.html" import render_pagination %}
+
+{% block content %}
+    <h1 style="text-align: center; margin-bottom: 30px;">قصص تصنيف: {{ category.name if category else 'غير معروف' }}</h1>
+
+    {# يمكن إضافة وصف للتصنيف إذا كان مخزنًا في المودل #}
+    {# {% if category.description %}
+        <p class="category-description" style="text-align: center; margin-bottom: 20px; color: #555;">{{ category.description }}</p>
+    {% endif %} #}
+
+    <div class="story-list">
+        {% if stories %}
+            {% for story in stories %}
+                 {% include 'includes/story_card.html' %}
+             {% endfor %}
+        {% elif category %}
+             <p style="text-align: center; color: #777;">لا توجد قصص منشورة حالياً في هذا التصنيف.</p>
+        {% else %}
+            <p style="text-align: center; color: #dc3545;">عذراً، لم يتم العثور على هذا التصنيف.</p>
+        {% endif %}
+    </div>
+
+     <!-- Pagination Links -->
+    {% if stories and pagination %}
+       {{ render_pagination(pagination, 'main.category_page', category_slug=category.slug) }}
+     {% endif %}
+
+{% endblock %}

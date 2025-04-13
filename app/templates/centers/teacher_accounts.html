@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% from "includes/formhelpers.html" import render_field %}
+
+{% block content %}
+<div class="container registration-container">
+    <header style="text-align: center; margin-bottom: 30px;">
+        <h1>إدارة معلمي مركز: {{ center.name }}</h1>
+        <p>يمكنك إضافة حتى {{ allowed_teachers }} معلم.</p>
+    </header>
+
+    <main>
+         <section class="current-teachers">
+              <h3>المعلمون الحاليون ({{ current_teachers|length }})</h3>
+              {% if current_teachers %}
+              <ul style="list-style: none; padding: 0; margin-bottom: 20px;">
+                 {% for teacher in current_teachers %}
+                     <li style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #eee;">{{ teacher.email }}</li>
+                 {% endfor %}
+              </ul>
+              {% else %}
+               <p>لا يوجد معلمون مضافون حالياً.</p>
+              {% endif %}
+         </section>
+         <hr>
+         <section class="add-teachers-form">
+              <h3>إضافة معلمين جدد</h3>
+               <form method="POST" action="{{ url_for('centers.manage_teachers') }}" novalidate>
+                    {{ form.hidden_tag() }} {# CSRF Token #}
+
+                    <p>أدخل البريد الإلكتروني لكل معلم في حقل منفصل. (يمكنك إضافة {{ allowed_teachers - (current_teachers|length) }} معلم كحد أقصى)</p>
+
+                    {# عرض الحقول يدوياً بناءً على العدد المسموح المتبقي #}
+                    {% set remaining_slots = allowed_teachers - (current_teachers|length) %}
+                    {% if remaining_slots > 0 %}
+                    <div id="teacher-email-fields">
+                       {% for i in range([remaining_slots, 5]|min) %} {# عرض 5 حقول أو العدد المتبقي أيهما أقل مبدئيا #}
+                       <div class="form-group">
+                           <label for="teacher_email_{{ i+1 }}">بريد المعلم {{ (current_teachers|length) + i + 1 }}</label>
+                           <input type="email" id="teacher_email_{{ i+1 }}" name="teacher_email" class="form-control" placeholder="teacher@example.com">
+                       </div>
+                       {% endfor %}
+                    </div>
+                    {# زر لإضافة حقول إضافية (JavaScript) إذا كان العدد المتبقي > 5 #}
+                     {% if remaining_slots > 5 %}
+                         <button type="button" id="add-more-teacher-fields" class="btn btn-light" style="margin-bottom: 15px;">إضافة حقل آخر</button>
+                         <script>
+                             document.getElementById('add-more-teacher-fields').addEventListener('click', function() {
+                                 const container = document.getElementById('teacher-email-fields');
+                                 const currentCount = container.children.length + {{ current_teachers|length }};
+                                 const allowedTotal = {{ allowed_teachers }};
+                                 if (currentCount < allowedTotal) {
+                                     const newIndex = currentCount + 1;
+                                     const newDiv = document.createElement('div');
+                                     newDiv.className = 'form-group';
+                                     newDiv.innerHTML = `
+                                         <label for="teacher_email_${newIndex}">بريد المعلم ${newIndex}</label>
+                                         <input type="email" id="teacher_email_${newIndex}" name="teacher_email" class="form-control" placeholder="teacher@example.com">
+                                     `;
+                                     container.appendChild(newDiv);
+                                     if (newIndex === allowedTotal) {
+                                         this.style.display = 'none'; // Hide button when limit reached
+                                     }
+                                 } else {
+                                      this.style.display = 'none'; // Hide button if somehow count exceeds limit
+                                 }
+                             });
+                         </script>
+                     {% endif %}
+                        {{ form.submit(class="btn btn-primary") }}
+                     {% else %}
+                         <p style="color: orange;">لقد وصلت للحد الأقصى من المعلمين المسموح بهم.</p>
+                     {% endif %}
+               </form>
+          </section>
+    </main>
+</div>
+{% endblock %}

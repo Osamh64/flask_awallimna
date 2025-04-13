@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% from "includes/formhelpers.html" import render_field %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px; margin: 20px auto; padding: 30px; background: white; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+     <h1>{% if story %}تعديل قصة: {{ story.title }}{% else %}كتابة قصة جديدة{% endif %}</h1>
+
+     {# تعديل الرابط في النموذج ليكون ديناميكيًا #}
+     {% set form_action = url_for('stories.edit_story', story_id=story.id) if story else url_for('stories.write_story') %}
+     <form method="POST" action="{{ form_action }}" enctype="multipart/form-data" novalidate>
+          {{ form.hidden_tag() }}
+
+         {{ render_field(form.title) }}
+         {{ render_field(form.short_description, rows=3) }}
+         {{ render_field(form.content, rows=10, placeholder="اكتب محتوى قصتك هنا...") }}
+
+          <div class="form-group">
+              {{ form.categories.label(class="form-label") }}
+              <div class="categories-checkboxes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                  {% for subfield in form.categories %}
+                  <div class="form-check">
+                       {{ subfield(class="form-check-input") }}
+                       {{ subfield.label(class="form-check-label") }}
+                  </div>
+                 {% endfor %}
+              </div>
+              {% if form.categories.errors %}
+                   <div class="invalid-feedback d-block"> {# Show errors for multiple checkboxes #}
+                      {% for error in form.categories.errors %}
+                       <span>{{ error }}</span><br>
+                      {% endfor %}
+                   </div>
+              {% endif %}
+          </div>
+
+          <div class="form-group">
+             {{ form.pdf_file.label(class="form-label") }}
+             {% if story and story.pdf_path %}
+                 <p style="font-size: 0.9em; color: #666;">الملف الحالي: <a href="{{ url_for('stories.serve_story_pdf', filename=story.pdf_path) }}" target="_blank">{{ story.pdf_path.split('/')[-1] }}</a> (للتغيير، قم برفع ملف جديد)</p>
+             {% endif %}
+             {{ form.pdf_file(class="form-control") }}
+              {% if form.pdf_file.errors %}
+                  <div class="invalid-feedback d-block">
+                      {% for error in form.pdf_file.errors %}<span>{{ error }}</span><br>{% endfor %}
+                  </div>
+              {% endif %}
+             <small class="form-text text-muted">اتركه فارغاً إذا أدخلت المحتوى النصي للقصة في الأعلى. يُسمح بملفات PDF فقط (حد أقصى {{ (current_app.config.MAX_CONTENT_LENGTH / (1024*1024*1024)) | round(1) }} GB).</small>
+          </div>
+
+          {{ render_field(form.status) }}
+
+          <div class="form-group mt-4 text-center">
+             {{ form.submit(class="btn btn-primary btn-lg") }}
+             <a href="{{ url_for('user.profile') }}" class="btn btn-light">إلغاء</a>
+          </div>
+     </form>
+ </div>
+{% endblock %}
+
+{% block scripts %}
+ {# Include specific JS if needed for story writing, like a rich text editor #}
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% macro render_stats_table(title, headers, data_dict, keys, row_span=1) %}
+<div class="stats-table-container" style="margin-bottom: 30px; overflow-x: auto;">
+    <h3 style="margin-bottom: 15px; text-align: center;">{{ title }}</h3>
+    <table class="table table-bordered table-striped table-hover" style="width: 100%; border-collapse: collapse; text-align: center;">
+        <thead>
+            <tr>
+                {% for header in headers %}
+                <th style="padding: 10px; border: 1px solid #ccc; background-color: #e9ecef;">{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+             {# Adjust logic if keys are grouped or need specific layout #}
+             {# This simple version assumes keys map directly to rows #}
+             {% set total_count = stats.get('total_stories', 1) %} {# Or total users etc. for percentage calculation #}
+             {% if data_dict %}
+             {% for key_tuple in keys %} {# Assuming keys is a list of tuples (key_id, display_name) #}
+             {% set key_id, display_name = key_tuple %}
+             {% set count = data_dict.get(key_id, 0) %}
+              {% if count is mapping %} {# Handle cases like stories_by_category which returns list of tuples #}
+                  {# Special rendering for key-value pair data #}
+                   <tr>
+                       <td style="padding: 8px; border: 1px solid #ddd;">{{ count[0] }}</td> {# Category name #}
+                       <td style="padding: 8px; border: 1px solid #ddd;">{{ count[1] }}</td> {# Category count #}
+                        <td style="padding: 8px; border: 1px solid #ddd;">{{ "%.1f%%"|format( (count[1] / (total_count if total_count else 1)) * 100 ) }}</td>
+                       {# Adjust if headers are different #}
+                   </tr>
+              {% else %}
+                  <tr>
+                       <td style="padding: 8px; border: 1px solid #ddd;">{{ display_name }}</td>
+                       <td style="padding: 8px; border: 1px solid #ddd;">{{ count }}</td>
+                       <td style="padding: 8px; border: 1px solid #ddd;">{# Calculate Percentage? Need total #}</td>
+                   </tr>
+              {% endif %}
+             {% endfor %}
+             {% else %}
+                <tr><td colspan="{{ headers|length }}" style="padding: 15px; border: 1px solid #ddd; color: #888;">لا توجد بيانات لعرضها.</td></tr>
+             {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+
+{% block content %}
+<div class="container statistics-page">
+    <h1 style="text-align: center; margin-bottom: 40px;">إحصائيات الموقع</h1>
+
+    {% if stats %}
+         {# --- إحصائيات القصص --- #}
+         <div class="stats-section">
+             <h3>إحصائيات القصص</h3>
+             <table class="table table-sm" style="max-width: 400px; margin-bottom: 20px;">
+                 <tr><td>الإجمالي:</td><td>{{ stats.get('total_stories', 0) }}</td></tr>
+                 <tr><td>المعلقة:</td><td>{{ stats.get('pending_stories', 0) }}</td></tr>
+                 <tr><td>المنشورة:</td><td>{{ stats.get('approved_stories', 0) }}</td></tr>
+                 {# Add rejected etc. #}
+             </table>
+
+            {# -- جدول القصص حسب التصنيف -- #}
+             <h4 style="margin-top: 20px;">توزيع القصص على التصنيفات</h4>
+             <table class="table table-bordered table-striped table-hover" style="width: 100%; border-collapse: collapse; text-align: center;">
+                 <thead><tr><th>التصنيف</th><th>العدد</th><th>النسبة</th></tr></thead>
+                 <tbody>
+                    {% for cat_name, cat_count in stats.get('stories_by_category', []) %}
+                        <tr>
+                           <td style="padding: 8px; border: 1px solid #ddd;">{{ cat_name }}</td>
+                           <td style="padding: 8px; border: 1px solid #ddd;">{{ cat_count }}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">
+                                 {% set total = stats.get('total_stories', 1) %}
+                                 {{ "%.1f%%"|format( (cat_count / (total if total > 0 else 1)) * 100 ) }}
+                            </td>
+                       </tr>
+                   {% else %}
+                        <tr><td colspan="3" style="padding: 15px; border: 1px solid #ddd; color: #888;">لا توجد بيانات.</td></tr>
+                   {% endfor %}
+                 </tbody>
+             </table>
+         </div>
+         <hr style="margin: 30px 0;">
+
+         {# --- إحصائيات المستخدمين --- #}
+          <div class="stats-section">
+             <h3>إحصائيات المستخدمين والحسابات</h3>
+             <table class="table table-sm" style="max-width: 400px; margin-bottom: 20px;">
+                 <tr><td>إجمالي الحسابات:</td><td>{{ stats.get('total_users', 0) }}</td></tr>
+                 <tr><td>القراء:</td><td>{{ stats.get('readers', 0) }}</td></tr>
+                 <tr><td>الكتاب:</td><td>{{ stats.get('writers', 0) }}</td></tr>
+                 <tr><td>المسؤولون:</td><td>{{ stats.get('admins', 0) }}</td></tr>
+                 <tr><td>المراكز المعتمدة:</td><td>{{ stats.get('centers', 0) }}</td></tr>
+                  {# Add subscription stats etc. #}
+            </table>
+        </div>
+         <hr style="margin: 30px 0;">
+
+        {# --- إحصائيات الدول (تحتاج لبيانات فعلية) --- #}
+         {# <div class="stats-section">
+             <h3>توزيع المستخدمين حسب الدول (مثال)</h3>
+              <p class="text-muted">تحتاج هذه البيانات للتجميع الفعلي من قاعدة البيانات.</p>
+             Render country stats table here if data is available
+        </div> #}
+
+    {% else %}
+        <p style="text-align: center; color: red;">حدث خطأ أثناء جلب الإحصائيات.</p>
+    {% endif %}
+
+
+</div>
+{% endblock %}
